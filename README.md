@@ -105,6 +105,6 @@ Simvito sells prepaid travel eSIMs. Checkout is in 20 languages and 25 currencie
 
 ## Files
 
-- `index.js`, `package.json`, `Dockerfile`: the stdio proxy.
+- `index.js`, `package.json`, `Dockerfile`: the stdio proxy. `npm test` (`test.mjs`) starts it and checks the hosted server answers.
 - `server.json`: the entry in the [official MCP Registry](https://registry.modelcontextprotocol.io/).
 - `lhm.plugin.json`: the [LobeHub](https://lobehub.com/mcp) marketplace listing.

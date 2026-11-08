@@ -4,15 +4,40 @@
   "description": "Simvito eSIM MCP server: compare travel eSIM data plans and local 4G/5G networks, check phone eSIM support and get payment links, from any AI assistant.",
   "mcpName": "com.simvito/esim",
   "type": "module",
-  "bin": { "simvito-mcp": "index.js" },
+  "bin": {
+    "simvito-mcp": "index.js"
+  },
   "main": "index.js",
-  "files": ["index.js", "README.md", "LICENSE"],
-  "engines": { "node": ">=18" },
-  "dependencies": { "@modelcontextprotocol/sdk": "1.32.2" },
-  "keywords": ["mcp", "model-context-protocol", "esim", "travel", "mobile-data", "roaming"],
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "esim",
+    "travel",
+    "mobile-data",
+    "roaming"
+  ],
   "author": "Simvito Limited <partners@simvito.com> (https://simvito.com/)",
   "homepage": "https://simvito.com/ai/",
-  "repository": { "type": "git", "url": "git+https://github.com/SimvitoTeam/simvito-mcp.git" },
-  "bugs": { "url": "https://github.com/SimvitoTeam/simvito-mcp/issues" },
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimvitoTeam/simvito-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SimvitoTeam/simvito-mcp/issues"
+  },
+  "license": "MIT",
+  "scripts": {
+    "test": "node test.mjs"
+  }
 }
