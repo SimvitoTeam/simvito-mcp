@@ -4,7 +4,7 @@ Let an AI assistant find, compare and buy travel eSIM data plans for you.
 
 Tell the assistant where you're going and for how long. It compares [Simvito](https://simvito.com/) plans by price, data and validity, shows which local networks each plan uses (4G/5G) and what happens when the data runs out, and gives you a link to pay on simvito.com. Searching is free and needs no account.
 
-This is a hosted (remote) MCP server. There is nothing to install or run: this repository holds the connection details and listing files, not the server code.
+This is a hosted (remote) MCP server: connect to the URL below and there is nothing to install. For clients that only run local servers, this repository also has a small open-source stdio proxy (`index.js`, published on npm as `simvito-mcp`) that forwards every MCP message to the hosted server.
 
 ## Connect
 
@@ -34,6 +34,23 @@ claude mcp add --transport http simvito "https://mcp.simvito.com/mcp?src=github"
   }
 }
 ```
+
+**Local (stdio) clients**: run the npm package, which forwards to the hosted server.
+
+```json
+{
+  "mcpServers": {
+    "simvito": {
+      "command": "npx",
+      "args": ["-y", "simvito-mcp"]
+    }
+  }
+}
+```
+
+Or with Docker: `docker build -t simvito-mcp . && docker run -i --rm simvito-mcp`.
+
+The proxy needs Node.js 18 or later and no API key. Account tools (`start_checkout`, `get_order_status`, `list_my_esims`) need the account connected, which works when your client connects to the hosted URL directly.
 
 Connecting a Simvito account (OAuth) is optional. It adds checkout inside the chat, order status and your list of eSIMs.
 
@@ -88,5 +105,6 @@ Simvito sells prepaid travel eSIMs. Checkout is in 20 languages and 25 currencie
 
 ## Files
 
+- `index.js`, `package.json`, `Dockerfile`: the stdio proxy.
 - `server.json`: the entry in the [official MCP Registry](https://registry.modelcontextprotocol.io/).
 - `lhm.plugin.json`: the [LobeHub](https://lobehub.com/mcp) marketplace listing.
