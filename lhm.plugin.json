@@ -1,7 +1,7 @@
 {
   "identifier": "simvito-mcp",
   "name": "Simvito eSIM",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Find and compare travel eSIM data plans by destination and trip length, see the local 4G/5G networks each plan uses, check if a phone supports eSIM, and get a link to pay on simvito.com.",
   "author": "Simvito Limited",
   "authorUrl": "https://simvito.com/",
@@ -3342,6 +3342,85 @@
       }
     }
   ],
-  "resources": [],
-  "prompts": []
+  "resources": [
+    {
+      "name": "guide",
+      "title": "How Simvito works in an AI assistant",
+      "uri": "simvito://guide",
+      "description": "How to search, compare and buy Simvito travel eSIMs with these tools: the usual order of tools, what to tell the user, refunds and adding data.",
+      "mimeType": "text/markdown"
+    },
+    {
+      "name": "checkout_basics",
+      "title": "Checkout languages, currencies and policies",
+      "uri": "simvito://checkout-basics",
+      "description": "The languages and currencies simvito.com checkout supports, and links to the terms and refund policy. Payment methods by country or currency come from the get_checkout_options tool.",
+      "mimeType": "application/json"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "trip_esim",
+      "title": "Pick an eSIM for a trip",
+      "description": "Find and compare travel eSIM plans for one destination and trip length, then recommend one.",
+      "arguments": [
+        {
+          "name": "destination",
+          "description": "Where you're going, e.g. 'Japan', 'Bali', 'Europe'",
+          "required": true
+        },
+        {
+          "name": "days",
+          "description": "Trip length in days, e.g. '7'",
+          "required": true
+        },
+        {
+          "name": "usage",
+          "description": "How you use data, e.g. 'maps and messaging', 'video calls', 'hotspot for a laptop'",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "best_network",
+      "title": "Which network is best there",
+      "description": "Compare the local mobile networks eSIM plans use at a destination: operators, 4G/5G and the cheapest plan on each.",
+      "arguments": [
+        {
+          "name": "destination",
+          "description": "Country or region, e.g. 'Thailand'",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "multi_country_trip",
+      "title": "eSIM for a multi-country trip",
+      "description": "For a trip through several countries, compare one regional plan with a separate plan per country.",
+      "arguments": [
+        {
+          "name": "itinerary",
+          "description": "Each stop and how long, e.g. 'Japan 7 days, then South Korea 5 days'",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "check_phone",
+      "title": "Does my phone support eSIM",
+      "description": "Check whether a phone model supports eSIM, including models bought in mainland China, Hong Kong or Macao.",
+      "arguments": [
+        {
+          "name": "phone",
+          "description": "Phone model, e.g. 'iPhone 13', 'Pixel 8', 'Galaxy S24'",
+          "required": true
+        },
+        {
+          "name": "bought_in",
+          "description": "Where the phone was bought, if mainland China, Hong Kong or Macao",
+          "required": false
+        }
+      ]
+    }
+  ]
 }

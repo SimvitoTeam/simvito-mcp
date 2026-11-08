@@ -54,6 +54,22 @@ Connecting a Simvito account (OAuth) is optional. It adds checkout inside the ch
 
 All tools are read-only except `start_checkout`. Nothing is charged inside the assistant: you always pay on simvito.com.
 
+## Prompts
+
+Ready-made requests you can pick in clients that show MCP prompts:
+
+| Prompt | Arguments |
+| --- | --- |
+| `trip_esim` | `destination`, `days`, optional `usage` |
+| `best_network` | `destination` |
+| `multi_country_trip` | `itinerary` |
+| `check_phone` | `phone`, optional `bought_in` |
+
+## Resources
+
+- `simvito://guide`: how to search, compare and buy with these tools.
+- `simvito://checkout-basics`: checkout languages and currencies, refund and terms links.
+
 ## Example prompts
 
 - "I'm going to Japan for 7 days. Which eSIM should I get?"
