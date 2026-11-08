@@ -1,0 +1,3347 @@
+{
+  "identifier": "simvito-mcp",
+  "name": "Simvito eSIM",
+  "version": "1.3.1",
+  "description": "Find and compare travel eSIM data plans by destination and trip length, see the local 4G/5G networks each plan uses, check if a phone supports eSIM, and get a link to pay on simvito.com.",
+  "author": "Simvito Limited",
+  "authorUrl": "https://simvito.com/",
+  "homepage": "https://simvito.com/ai/",
+  "icon": "https://simvito.com/icon-512.png",
+  "cloudEndpoint": "https://mcp.simvito.com/mcp?src=lobehub",
+  "tags": [
+    "esim",
+    "travel",
+    "mobile-data",
+    "roaming",
+    "shopping"
+  ],
+  "localizations": [
+    {
+      "locale": "zh-CN",
+      "name": "Simvito eSIM",
+      "description": "按目的地和行程天数查找、比较出国旅行 eSIM 流量套餐，看每个套餐用的当地 4G/5G 网络，查手机是否支持 eSIM，并给出在 simvito.com 付款的链接。"
+    }
+  ],
+  "tools": [
+    {
+      "name": "find_destination",
+      "title": "Find a destination",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Find where a trip goes: a country, a region such as 'Europe' or 'Asia', or a multi-country plan, by name in any language, ISO code or misspelling (many cities and islands such as 'Tokyo' or 'Bali' work too). Returns destination slugs for the other tools; no prices.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "description": "Country, territory or region name, e.g. 'Japan', '日本', 'JP', 'Europe'"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "destinations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "english_name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "slug",
+                "code",
+                "name",
+                "english_name",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "multi_country": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "countries": {
+                  "type": "number"
+                },
+                "coverage": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "slug",
+                "name",
+                "countries",
+                "coverage",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "regions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "destinations",
+          "multi_country",
+          "regions"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Find a destination",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "search_plans",
+      "title": "Search eSIM plans",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Find travel eSIM data plans for one destination and trip length, e.g. 'eSIM for Japan, 7 days' or '10 GB for Thailand'. Up to 5 plans with price in the user's currency, data, validity, the local operators each plan uses with 4G/5G, what happens when the data runs out, hotspot and top-up support, and a link to each plan.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "description": "Destination slug from find_destination (e.g. 'japan', 'europe-33'), an ISO country code, or a country name in any language."
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365,
+            "description": "Trip length in days"
+          },
+          "data_gb": {
+            "description": "Total data needed for the whole trip in GB; omit if unsure",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "plan_type": {
+            "description": "total = one data allowance for the trip; daily = allowance renews each day; unlimited. Defaults to any.",
+            "type": "string",
+            "enum": [
+              "any",
+              "total",
+              "daily",
+              "unlimited"
+            ]
+          },
+          "currency": {
+            "description": "The user's currency (ISO 4217) for prices: USD, EUR, GBP, HKD, CNY, SGD, JPY, AUD, NZD, CAD, BRL, IDR, MYR, PHP, THB, KRW, PLN, CHF, SEK, TWD, VND, TRY, SAR, AED, ILS. Defaults to USD.",
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "required": [
+          "destination",
+          "days"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "country",
+                  "multi_country"
+                ]
+              },
+              "matched_from": {
+                "type": "string"
+              },
+              "also_matches": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slug",
+                    "name"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "slug",
+              "name",
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          "trip_days": {
+            "type": "number"
+          },
+          "plans": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "plan_id": {
+                  "type": "string"
+                },
+                "destination": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "total",
+                    "daily",
+                    "unlimited"
+                  ]
+                },
+                "data": {
+                  "type": "string"
+                },
+                "data_gb": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "validity_days": {
+                  "type": "number"
+                },
+                "price": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "usd": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency",
+                    "text",
+                    "usd"
+                  ],
+                  "additionalProperties": false
+                },
+                "after_data_cap": {
+                  "type": "string"
+                },
+                "networks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "operator": {
+                        "type": "string"
+                      },
+                      "network": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "operator",
+                      "network"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "coverage": {
+                  "type": "object",
+                  "properties": {
+                    "countries": {
+                      "type": "number"
+                    },
+                    "operators": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "countries",
+                    "operators"
+                  ],
+                  "additionalProperties": false
+                },
+                "countries": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "networks": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "operator": {
+                              "type": "string"
+                            },
+                            "network": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "operator",
+                            "network"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "code",
+                      "name",
+                      "networks"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "covered_countries": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "facts": {
+                  "type": "string",
+                  "enum": [
+                    "complete",
+                    "partial"
+                  ]
+                },
+                "hotspot": {
+                  "type": "string",
+                  "enum": [
+                    "yes",
+                    "not_stated"
+                  ]
+                },
+                "top_up": {
+                  "type": "string",
+                  "enum": [
+                    "data",
+                    "days",
+                    "none",
+                    "not_stated"
+                  ]
+                },
+                "notices": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "labels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "plan_url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "plan_id",
+                "destination",
+                "title",
+                "type",
+                "data",
+                "data_gb",
+                "validity_days",
+                "price",
+                "after_data_cap",
+                "networks",
+                "facts",
+                "hotspot",
+                "top_up",
+                "notices",
+                "labels",
+                "plan_url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "more_plans_url": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "destination",
+          "trip_days",
+          "plans",
+          "more_plans_url",
+          "note"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Search eSIM plans",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "compare_networks",
+      "title": "Compare networks",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Compare the local mobile networks for a destination side by side, for questions like 'which network is best in Thailand' or 'which eSIM has 5G in Tokyo': each operator the plans use, its best generation (4G/5G), how many plans use it and the cheapest one. For a multi-country plan, pass country to see that country's operators.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "description": "Destination slug from find_destination (e.g. 'japan', 'europe-33'), an ISO country code, or a country name in any language."
+          },
+          "country": {
+            "description": "Only for multi-country destinations: one covered country (name or ISO code)",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 60
+          },
+          "currency": {
+            "description": "The user's currency (ISO 4217) for prices: USD, EUR, GBP, HKD, CNY, SGD, JPY, AUD, NZD, CAD, BRL, IDR, MYR, PHP, THB, KRW, PLN, CHF, SEK, TWD, VND, TRY, SAR, AED, ILS. Defaults to USD.",
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "required": [
+          "destination"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "country",
+                  "multi_country"
+                ]
+              },
+              "matched_from": {
+                "type": "string"
+              },
+              "also_matches": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slug",
+                    "name"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "slug",
+              "name",
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          "operators": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "operator": {
+                  "type": "string"
+                },
+                "networks": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "plan_count": {
+                  "type": "number"
+                },
+                "cheapest": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "plan_id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "price": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "number"
+                            },
+                            "currency": {
+                              "type": "string"
+                            },
+                            "text": {
+                              "type": "string"
+                            },
+                            "usd": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency",
+                            "text",
+                            "usd"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "plan_id",
+                        "title",
+                        "price"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "operator",
+                "networks",
+                "plan_count",
+                "cheapest"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "operators": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "operator": {
+                        "type": "string"
+                      },
+                      "network": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "operator",
+                      "network"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "code",
+                "name",
+                "operators"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "destination",
+          "operators",
+          "countries",
+          "note",
+          "url"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Compare networks",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "plan_trip",
+      "title": "Plan a multi-country trip",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "For a trip through several countries (e.g. Japan 7 days, then Korea 5 days), compare one regional plan that covers every stop with a separate plan for each country, using the cheapest plans that cover each stop's days at the daily data need.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "stops": {
+            "minItems": 1,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "country": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 60,
+                  "description": "Country name or ISO code"
+                },
+                "days": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 365
+                }
+              },
+              "required": [
+                "country",
+                "days"
+              ]
+            }
+          },
+          "data_gb_per_day": {
+            "description": "Expected data use per day in GB; defaults to 1",
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 50
+          },
+          "currency": {
+            "description": "The user's currency (ISO 4217) for prices: USD, EUR, GBP, HKD, CNY, SGD, JPY, AUD, NZD, CAD, BRL, IDR, MYR, PHP, THB, KRW, PLN, CHF, SEK, TWD, VND, TRY, SAR, AED, ILS. Defaults to USD.",
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "required": [
+          "stops"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "total_days": {
+            "type": "number"
+          },
+          "data_gb_per_day": {
+            "type": "number"
+          },
+          "data_gb_total": {
+            "type": "number"
+          },
+          "one_plan": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "destination": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "plan_id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "number"
+                      },
+                      "currency": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "usd": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "amount",
+                      "currency",
+                      "text",
+                      "usd"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "plan_id": {
+                            "type": "string"
+                          },
+                          "destination": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "total",
+                              "daily",
+                              "unlimited"
+                            ]
+                          },
+                          "data": {
+                            "type": "string"
+                          },
+                          "data_gb": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "validity_days": {
+                            "type": "number"
+                          },
+                          "price": {
+                            "type": "object",
+                            "properties": {
+                              "amount": {
+                                "type": "number"
+                              },
+                              "currency": {
+                                "type": "string"
+                              },
+                              "text": {
+                                "type": "string"
+                              },
+                              "usd": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "amount",
+                              "currency",
+                              "text",
+                              "usd"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "after_data_cap": {
+                            "type": "string"
+                          },
+                          "networks": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "operator": {
+                                  "type": "string"
+                                },
+                                "network": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "operator",
+                                "network"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "coverage": {
+                            "type": "object",
+                            "properties": {
+                              "countries": {
+                                "type": "number"
+                              },
+                              "operators": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "countries",
+                              "operators"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "countries": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "code": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "networks": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "operator": {
+                                        "type": "string"
+                                      },
+                                      "network": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "operator",
+                                      "network"
+                                    ],
+                                    "additionalProperties": false
+                                  }
+                                }
+                              },
+                              "required": [
+                                "code",
+                                "name",
+                                "networks"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "covered_countries": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "facts": {
+                            "type": "string",
+                            "enum": [
+                              "complete",
+                              "partial"
+                            ]
+                          },
+                          "hotspot": {
+                            "type": "string",
+                            "enum": [
+                              "yes",
+                              "not_stated"
+                            ]
+                          },
+                          "top_up": {
+                            "type": "string",
+                            "enum": [
+                              "data",
+                              "days",
+                              "none",
+                              "not_stated"
+                            ]
+                          },
+                          "notices": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "labels": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "plan_url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "plan_id",
+                          "destination",
+                          "title",
+                          "type",
+                          "data",
+                          "data_gb",
+                          "validity_days",
+                          "price",
+                          "after_data_cap",
+                          "networks",
+                          "facts",
+                          "hotspot",
+                          "top_up",
+                          "notices",
+                          "labels",
+                          "plan_url"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "destination",
+                  "name",
+                  "plan_id",
+                  "title",
+                  "price",
+                  "url",
+                  "details"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "separate_plans": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "number"
+                      },
+                      "currency": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "usd": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "amount",
+                      "currency",
+                      "text",
+                      "usd"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "stops": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "days": {
+                      "type": "number"
+                    },
+                    "destination": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "matched_from": {
+                      "type": "string"
+                    },
+                    "plan": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "plan_id": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "price": {
+                              "type": "object",
+                              "properties": {
+                                "amount": {
+                                  "type": "number"
+                                },
+                                "currency": {
+                                  "type": "string"
+                                },
+                                "text": {
+                                  "type": "string"
+                                },
+                                "usd": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "amount",
+                                "currency",
+                                "text",
+                                "usd"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "url": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "plan_id": {
+                                      "type": "string"
+                                    },
+                                    "destination": {
+                                      "type": "string"
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "enum": [
+                                        "total",
+                                        "daily",
+                                        "unlimited"
+                                      ]
+                                    },
+                                    "data": {
+                                      "type": "string"
+                                    },
+                                    "data_gb": {
+                                      "type": [
+                                        "number",
+                                        "null"
+                                      ]
+                                    },
+                                    "validity_days": {
+                                      "type": "number"
+                                    },
+                                    "price": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "number"
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        },
+                                        "text": {
+                                          "type": "string"
+                                        },
+                                        "usd": {
+                                          "type": "number"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency",
+                                        "text",
+                                        "usd"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "after_data_cap": {
+                                      "type": "string"
+                                    },
+                                    "networks": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "operator": {
+                                            "type": "string"
+                                          },
+                                          "network": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": [
+                                          "operator",
+                                          "network"
+                                        ],
+                                        "additionalProperties": false
+                                      }
+                                    },
+                                    "coverage": {
+                                      "type": "object",
+                                      "properties": {
+                                        "countries": {
+                                          "type": "number"
+                                        },
+                                        "operators": {
+                                          "type": "number"
+                                        }
+                                      },
+                                      "required": [
+                                        "countries",
+                                        "operators"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "countries": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "code": {
+                                            "type": "string"
+                                          },
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "networks": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "operator": {
+                                                  "type": "string"
+                                                },
+                                                "network": {
+                                                  "type": "string"
+                                                }
+                                              },
+                                              "required": [
+                                                "operator",
+                                                "network"
+                                              ],
+                                              "additionalProperties": false
+                                            }
+                                          }
+                                        },
+                                        "required": [
+                                          "code",
+                                          "name",
+                                          "networks"
+                                        ],
+                                        "additionalProperties": false
+                                      }
+                                    },
+                                    "covered_countries": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "facts": {
+                                      "type": "string",
+                                      "enum": [
+                                        "complete",
+                                        "partial"
+                                      ]
+                                    },
+                                    "hotspot": {
+                                      "type": "string",
+                                      "enum": [
+                                        "yes",
+                                        "not_stated"
+                                      ]
+                                    },
+                                    "top_up": {
+                                      "type": "string",
+                                      "enum": [
+                                        "data",
+                                        "days",
+                                        "none",
+                                        "not_stated"
+                                      ]
+                                    },
+                                    "notices": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "labels": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "plan_url": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "plan_id",
+                                    "destination",
+                                    "title",
+                                    "type",
+                                    "data",
+                                    "data_gb",
+                                    "validity_days",
+                                    "price",
+                                    "after_data_cap",
+                                    "networks",
+                                    "facts",
+                                    "hotspot",
+                                    "top_up",
+                                    "notices",
+                                    "labels",
+                                    "plan_url"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "plan_id",
+                            "title",
+                            "price",
+                            "url",
+                            "details"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "country",
+                    "name",
+                    "days",
+                    "destination",
+                    "plan"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "total",
+              "stops"
+            ],
+            "additionalProperties": false
+          },
+          "savings_with_one_plan": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "usd": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "currency",
+                  "text",
+                  "usd"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "one_plan_costs_more": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "usd": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "currency",
+                  "text",
+                  "usd"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "other_regional_plans": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "destination": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "extra_countries": {
+                  "type": "number"
+                },
+                "from_price": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "number"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "usd": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "amount",
+                        "currency",
+                        "text",
+                        "usd"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "destination",
+                "name",
+                "extra_countries",
+                "from_price",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "total_days",
+          "data_gb_per_day",
+          "data_gb_total",
+          "one_plan",
+          "separate_plans",
+          "savings_with_one_plan",
+          "one_plan_costs_more",
+          "other_regional_plans",
+          "note"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Plan a multi-country trip",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "check_device",
+      "title": "Check phone eSIM support",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Check whether a phone supports eSIM, e.g. 'does my iPhone 13 support eSIM?'. Covers iPhone, Google Pixel and Samsung Galaxy from the manufacturers' official lists, including the exceptions for phones bought in mainland China, Hong Kong or Macao. Gives a verdict (supports_esim / no_esim); pass purchase_region when the user says where the phone was bought.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 60,
+            "description": "Phone model, e.g. 'iPhone 13', 'Pixel 8', 'Galaxy S23'"
+          },
+          "purchase_region": {
+            "description": "ISO code of the country/region where the phone was bought, e.g. 'CN', 'HK', 'US'",
+            "type": "string",
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "listed",
+              "not_listed",
+              "ambiguous"
+            ]
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "supports_esim",
+              "no_esim",
+              "need_exact_model",
+              "not_on_list"
+            ]
+          },
+          "verdict_note": {
+            "type": "string"
+          },
+          "not_if_bought_in": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "matches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "brand": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "brand",
+                "model"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "brand": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "basis": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "exceptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "region_exception": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "checked_on": {
+            "type": "string"
+          },
+          "devices_page": {
+            "type": "string"
+          },
+          "app": {
+            "type": "object",
+            "properties": {
+              "ios_url": {
+                "type": "string"
+              },
+              "android_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ios_url",
+              "android_url"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "query",
+          "status",
+          "verdict",
+          "verdict_note",
+          "not_if_bought_in",
+          "matches",
+          "brand",
+          "basis",
+          "exceptions",
+          "region_exception",
+          "sources",
+          "checked_on",
+          "devices_page"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Check phone eSIM support",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_buy_link",
+      "title": "Get a purchase link",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Get the simvito.com checkout link for a plan from search_plans or plan_trip, with the price in the user's currency (total for the quantity) and the payment methods for that currency. The user signs in and pays on simvito.com; nothing is charged here.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "description": "Destination slug from find_destination (e.g. 'japan', 'europe-33'), an ISO country code, or a country name in any language."
+          },
+          "plan_id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80,
+            "description": "plan_id returned by search_plans or plan_trip"
+          },
+          "trip_days": {
+            "description": "Trip length in days, if known",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "quantity": {
+            "description": "Number of eSIMs (one per traveller). Defaults to 1.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "currency": {
+            "description": "The user's currency (ISO 4217) for prices: USD, EUR, GBP, HKD, CNY, SGD, JPY, AUD, NZD, CAD, BRL, IDR, MYR, PHP, THB, KRW, PLN, CHF, SEK, TWD, VND, TRY, SAR, AED, ILS. Defaults to USD.",
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "required": [
+          "plan_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "object",
+            "properties": {
+              "plan_id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "validity_days": {
+                "type": "number"
+              },
+              "price": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "usd": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "currency",
+                  "text",
+                  "usd"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "plan_id",
+              "title",
+              "validity_days",
+              "price"
+            ],
+            "additionalProperties": false
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "total": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              },
+              "usd": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "amount",
+              "currency",
+              "text",
+              "usd"
+            ],
+            "additionalProperties": false
+          },
+          "payment_methods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "buy_url": {
+            "type": "string"
+          },
+          "plan_url": {
+            "type": "string"
+          },
+          "code_included": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "percent": {
+                    "type": "number"
+                  },
+                  "expires_at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "percent",
+                  "expires_at"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "destination",
+          "plan",
+          "quantity",
+          "total",
+          "payment_methods",
+          "buy_url",
+          "plan_url",
+          "code_included",
+          "note"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Get a purchase link",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "list_my_esims",
+      "title": "List my eSIMs",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "List the eSIMs in the user's connected Simvito account: destination, plan, status, whether installed, data left and expiry, with a link to manage each one (install, add data) on simvito.com. Requires connecting a Simvito account. Never returns installation codes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "esims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "destination": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slug",
+                    "name"
+                  ],
+                  "additionalProperties": false
+                },
+                "plan": {
+                  "type": "object",
+                  "properties": {
+                    "size": {
+                      "type": "string"
+                    },
+                    "days": {
+                      "type": "number"
+                    },
+                    "daily": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "size",
+                    "days",
+                    "daily"
+                  ],
+                  "additionalProperties": false
+                },
+                "status": {
+                  "type": "string"
+                },
+                "installed": {
+                  "type": "boolean"
+                },
+                "usage": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "used_bytes": {
+                          "type": "number"
+                        },
+                        "total_bytes": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "remaining_bytes": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "unlimited": {
+                          "type": "boolean"
+                        },
+                        "updated_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "used_bytes",
+                        "total_bytes",
+                        "remaining_bytes",
+                        "unlimited",
+                        "updated_at"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "manage_url": {
+                  "type": "string"
+                },
+                "order_display_id": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "destination",
+                "plan",
+                "status",
+                "installed",
+                "usage",
+                "expires_at",
+                "manage_url",
+                "order_display_id",
+                "created_at"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "account_url": {
+            "type": "string"
+          },
+          "app": {
+            "type": "object",
+            "properties": {
+              "ios_url": {
+                "type": "string"
+              },
+              "android_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ios_url",
+              "android_url"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "esims",
+          "account_url",
+          "app"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "List my eSIMs",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "esim:read"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_checkout_options",
+      "title": "Checkout options: languages, currencies, payment methods",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Languages, currencies and payment methods at simvito.com checkout. Pass the buyer's country or currency to get the default currency there and the payment methods that currency can be paid with (cards, Apple Pay, Google Pay, PayPal, local wallets and bank payments).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "description": "Buyer's country or region (ISO 3166-1 alpha-2, e.g. 'JP', 'DE')",
+            "type": "string",
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "currency": {
+            "description": "The user's currency (ISO 4217) for prices: USD, EUR, GBP, HKD, CNY, SGD, JPY, AUD, NZD, CAD, BRL, IDR, MYR, PHP, THB, KRW, PLN, CHF, SEK, TWD, VND, TRY, SAR, AED, ILS. Defaults to USD.",
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$"
+          },
+          "language": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "site_url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "name",
+                "site_url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "currencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "symbol",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "default_currency": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "payment_methods": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "card",
+                        "wallet",
+                        "paypal",
+                        "bank",
+                        "pay_later"
+                      ]
+                    },
+                    "market": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "type"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "local_methods_by_country": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "languages",
+          "currencies",
+          "default_currency",
+          "currency",
+          "payment_methods",
+          "note"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Checkout options: languages, currencies, payment methods",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      }
+    },
+    {
+      "name": "start_checkout",
+      "title": "Get payment links",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "When the user decides to buy and their Simvito account is connected: places the order on their account and returns two payment links to give them exactly as returned, a secure payment page for cards, Apple Pay, Google Pay and local wallets, and PayPal (when available for this order), with the total, any discount and an order number. Nothing is charged until the user pays on one of those pages. Pass items for up to 5 different plans from search_plans or plan_trip (up to 10 eSIMs in all), or plan_id and quantity for one plan. If the account isn't connected, use get_buy_link instead.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "description": "The destination search_plans returned with the plan(s); can also be given on each item.",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "items": {
+            "description": "The plans to buy, each with its quantity.",
+            "minItems": 1,
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "plan_id": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80,
+                  "description": "plan_id returned by search_plans or plan_trip"
+                },
+                "quantity": {
+                  "description": "Number of eSIMs of this plan (one per traveller). Defaults to 1.",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                },
+                "destination": {
+                  "description": "The destination search_plans returned with this plan, if it differs from the top-level destination",
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80
+                },
+                "expected_unit_amount": {
+                  "description": "Only after price_changed: the new unit price of this plan the user accepted. Otherwise omit.",
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "plan_id"
+              ]
+            }
+          },
+          "plan_id": {
+            "description": "Shorthand for a single plan: plan_id returned by search_plans or plan_trip (instead of items)",
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "quantity": {
+            "description": "With plan_id: number of eSIMs (one per traveller). Defaults to 1.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "expected_unit_amount": {
+            "description": "With plan_id, only after price_changed: the new unit price the user accepted. Otherwise omit; the quoted price is used.",
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "description": "The user's currency (ISO 4217) for prices: USD, EUR, GBP, HKD, CNY, SGD, JPY, AUD, NZD, CAD, BRL, IDR, MYR, PHP, THB, KRW, PLN, CHF, SEK, TWD, VND, TRY, SAR, AED, ILS. Defaults to USD.",
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          },
+          "device": {
+            "description": "Where the user will open the payment link, if you know: 'phone' or 'computer'",
+            "type": "string",
+            "enum": [
+              "phone",
+              "computer"
+            ]
+          },
+          "confirmations": {
+            "description": "Codes from a previous confirmation_required result that the user explicitly agreed to after seeing each text. Never fill these in for the user.",
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,39}$"
+            }
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "payment_links",
+              "confirmation_required",
+              "price_changed"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "plan_id": {
+                  "type": "string"
+                },
+                "destination": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "validity_days": {
+                  "type": "number"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "unit_price": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency",
+                    "text"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "plan_id",
+                "destination",
+                "title",
+                "validity_days",
+                "quantity",
+                "unit_price"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "checkout_id": {
+            "type": "string"
+          },
+          "order_display_id": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "card_and_wallets": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "methods": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "url",
+                  "methods"
+                ],
+                "additionalProperties": false
+              },
+              "paypal": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "url": {
+                        "type": "string"
+                      },
+                      "order_display_id": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "order_display_id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "card_and_wallets",
+              "paypal"
+            ],
+            "additionalProperties": false
+          },
+          "total": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "amount",
+              "currency",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          "list_total": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "currency",
+                  "text"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coupon": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "percent": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "amount": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "amount",
+                          "currency",
+                          "text"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "percent",
+                  "amount"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "required": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "price_changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "plan_id": {
+                  "type": "string"
+                },
+                "unit_price": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency",
+                    "text"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "plan_id",
+                "unit_price"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "policies": {
+            "type": "object",
+            "properties": {
+              "terms_url": {
+                "type": "string"
+              },
+              "refund_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "terms_url",
+              "refund_url"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "items",
+          "quantity",
+          "note"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Get payment links",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "esim:read"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_order_status",
+      "title": "Check an order",
+      "icons": [
+        {
+          "src": "https://simvito.com/icon-512.png",
+          "mimeType": "image/png",
+          "sizes": [
+            "512x512"
+          ]
+        },
+        {
+          "src": "https://simvito.com/favicon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "After the user pays through start_checkout's links (e.g. they say 'paid' or 'is my eSIM ready?'): shows whether the payment arrived and the eSIM is ready, waiting up to about 25 seconds for it, with the eSIM, a link to install and manage it, and the Simvito app. Never returns installation codes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "checkout_id": {
+            "type": "string",
+            "pattern": "^aic_[A-Za-z0-9_-]{6,100}$",
+            "description": "checkout_id returned by start_checkout"
+          },
+          "locale": {
+            "description": "Language of the conversation, as a simvito.com language code ('en', 'ja', 'zh-CN', 'es'…); names and links follow it. Defaults to 'en'.",
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "de",
+              "it",
+              "th",
+              "vi",
+              "id",
+              "ms",
+              "es",
+              "ko",
+              "fr",
+              "pt",
+              "nl",
+              "pl",
+              "tr",
+              "ar",
+              "he",
+              "ru"
+            ]
+          }
+        },
+        "required": [
+          "checkout_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "checkout_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "awaiting_payment",
+              "paid",
+              "delivering",
+              "delivered",
+              "failed",
+              "cancelled",
+              "expired"
+            ]
+          },
+          "still_waiting": {
+            "type": "boolean"
+          },
+          "order_display_id": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "paid_with": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "esims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "destination": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slug",
+                    "name"
+                  ],
+                  "additionalProperties": false
+                },
+                "plan": {
+                  "type": "object",
+                  "properties": {
+                    "size": {
+                      "type": "string"
+                    },
+                    "days": {
+                      "type": "number"
+                    },
+                    "daily": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "size",
+                    "days",
+                    "daily"
+                  ],
+                  "additionalProperties": false
+                },
+                "status": {
+                  "type": "string"
+                },
+                "installed": {
+                  "type": "boolean"
+                },
+                "usage": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "used_bytes": {
+                          "type": "number"
+                        },
+                        "total_bytes": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "remaining_bytes": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "unlimited": {
+                          "type": "boolean"
+                        },
+                        "updated_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "used_bytes",
+                        "total_bytes",
+                        "remaining_bytes",
+                        "unlimited",
+                        "updated_at"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "manage_url": {
+                  "type": "string"
+                },
+                "order_display_id": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "destination",
+                "plan",
+                "status",
+                "installed",
+                "usage",
+                "expires_at",
+                "manage_url",
+                "order_display_id",
+                "created_at"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "duplicate_payment": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "order_display_id": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "refunded": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "order_display_id",
+                  "refunded"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "order_url": {
+            "type": "string"
+          },
+          "account_url": {
+            "type": "string"
+          },
+          "app": {
+            "type": "object",
+            "properties": {
+              "ios_url": {
+                "type": "string"
+              },
+              "android_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ios_url",
+              "android_url"
+            ],
+            "additionalProperties": false
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "checkout_id",
+          "status",
+          "still_waiting",
+          "order_display_id",
+          "paid_with",
+          "esims",
+          "duplicate_payment",
+          "order_url",
+          "account_url",
+          "note"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Check an order",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "oauth2",
+            "scopes": [
+              "esim:read"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}
