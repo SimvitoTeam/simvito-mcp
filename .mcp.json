@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "simvito": {
+      "type": "http",
+      "url": "https://mcp.simvito.com/mcp?src=cursor-directory"
+    }
+  }
+}
